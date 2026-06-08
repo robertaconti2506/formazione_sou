@@ -1,0 +1,23 @@
+#!/bin/bash # shebang, specifica quale interprete sarà utilizzato per eseguire lo script (in questo caso bash)
+# fetch_address.sh
+
+declare -A address
+#       -A option declares associative array.
+
+address[Charles]="414 W. 10th Ave., Baltimore, MD 21236" # associa alla chiave "Charles" il valore tra virgolette
+address[John]="202 E. 3rd St., New York, NY 10009" # associa alla chiave "John" il valore tra virgolette
+address[Wilma]="1854 Vermont Ave, Los Angeles, CA 90023" # associa alla chiave "Wilma" il valore tra virgolette
+
+
+echo "Charles's address is ${address[Charles]}." # stampa il contenuto tra virgolette e il valore associato alla chiave "Charles"
+# Charles's address is 414 W. 10th Ave., Baltimore, MD 21236.
+echo "Wilma's address is ${address[Wilma]}." # stampa il contenuto tra virgolette e il valore del vettore associato alla chiave "Wilma"
+# Wilma's address is 1854 Vermont Ave, Los Angeles, CA 90023.
+echo "John's address is ${address[John]}." # stampa il contenuto tra virgolette e il valore del vettore associato alla chiave "John"
+# John's address is 202 E. 3rd St., New York, NY 10009.
+
+echo
+
+echo "${!address[*]}"   # The array indices ... # restituisce tutte le chiavi dell'array
+# Charles John Wilma
+
