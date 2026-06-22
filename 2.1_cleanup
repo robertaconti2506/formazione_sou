@@ -1,9 +1,0 @@
-# Cleanup
-# Run as root, of course.
-
-# File per la "pulizia" dei file di log 
-cd /var/log # ci spostiamo nella cartella contenente i file dei log
-cat /dev/null > messages # copia il contenuto del file "null" (vuoto) nel file "message" 
-cat /dev/null > wtmp # allo stesso modo viene "cancellato" anche il file wtmp che contiene gli accessi, i logout e i riavvii del sistema 
-echo "Log files cleaned up." # stampa a video "Log files cleaned up"
-
