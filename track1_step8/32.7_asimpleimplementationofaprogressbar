@@ -1,0 +1,34 @@
+#! /bin/bash # shebang, specifica quale interprete sarà utilizzato per eseguire lo script (in questo caso bash)
+# progress-bar2.sh
+# Author: Graham Ewart (with reformatting by ABS Guide author).
+# Used in ABS Guide with permission (thanks!).
+
+# Invoke this script with bash. It doesn't work with sh.
+
+interval=1 # assegna alla variabile interval il valore 1
+long_interval=10 # assegna alla variabile long_interval il valore 10 
+
+{                                       # tutto quello compreso tra le {} viene eseguito come un unico blocco 
+     trap "exit" SIGUSR1 # se "SIGUR1" allora esegui "exit"
+     sleep $interval; sleep $interval # attesa di due volte interval prima di eseguire il ciclo while
+     while true # se è vero esegui:
+     do
+             echo -n '.'     # Use dots. # stampa una serie infinita (perchè sempre vera) di "." senza andare a capo
+       sleep $interval 
+     done; } &         # Start a progress bar as a background process.
+                       # & permette l'esecuzione del blocco tra {} in background  
+
+pid=$! # contiene il PID del processo "più recente" in background 
+trap "echo !; kill -USR1 $pid; wait $pid"  EXIT        # To handle ^C. 
+                                                       # quando lo script termina vengono eseguiti i comandi tra virgolette 
+
+echo -n 'Long-running process ' # stampa "Long-running process"
+sleep $long_interval            # pausa di long_interval secondi
+echo ' Finished!'               # stampa "Finished!" 
+
+kill -USR1 $pid        # invia il segnale "SIGUR1 al processo con PID salvato nella variabile pid
+wait $pid              # Stop the progress bar. # aspetta che il processo sia terminato 
+trap EXIT              # elimina il trap associato a "EXIT"
+
+exit $?                # contiene il codice di uscita dell'ultimo comando eseguito
+
