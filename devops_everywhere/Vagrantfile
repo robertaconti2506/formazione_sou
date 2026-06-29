@@ -1,0 +1,34 @@
+Vagrant.configure("2") do |config| 
+
+  # sistema operativo: Debian
+  config.vm.box = "debian/bookworm64" 
+
+  # hostname interno: coffee-monitor
+  config.vm.hostname = "coffee-monitor" 
+ 
+  # nome per Virtualbox: debian-coffee
+  config.vm.define "debian-coffee" 
+
+  # port forwarding per accedere al web server dal PC
+  # porta 80 della VM (HTTP), porta 880 del computer host
+  config.vm.network "forwarded_port", 
+    guest: 80, 
+    host: 880
+
+  # provider: VirtualBox
+  config.vm.provider "virtualbox" do |vb| 
+    vb.name = "debian-coffee" 
+
+    # RAM 
+    vb.memory = "1024"
+
+    # CPU 
+    vb.cpus = 1 
+  end 
+
+  # provisioning con Ansible 
+  config.vm.provision "ansible" do |ansible|
+    ansible.playbook = "playbook.yml" 
+  end 
+
+end 

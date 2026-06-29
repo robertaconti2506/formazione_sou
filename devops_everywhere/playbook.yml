@@ -1,0 +1,99 @@
+---
+
+# Playbook Ansible per il monitoraggio della macchina del caffè aziendale
+- name: Coffee --status
+  hosts: all
+  become: true
+
+  tasks:
+
+    # Aggiornamento dei pacchetti apt
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600 
+
+    # Installazione jq per il corretto funzionamento del file json
+    - name: Install jq
+      apt: 
+        name: jq
+        state: present
+
+    # Installazione Nginx per la creazione del web server
+    - name: Install nginx
+      apt:
+        name: nginx
+        state: present
+
+    # Avvio di Nginx
+    - name: Start and enable nginx
+      service:
+        name: nginx
+        state: started
+        enabled: true
+
+    # Creazione della pagina HTML nella VM
+    - name: Create index.html
+      copy:
+        dest: /var/www/html/index.html
+        content: |
+          <!DOCTYPE html>
+          <html lang="it">
+          <head>
+            <meta charset="UTF-8">
+            <title>Coffee --status</title>
+          </head>
+          <body>
+            <h1>☕ Coffee --status</h1>
+            <p>Stato: INIT</p>
+          </body>
+          </html>
+
+    # Creazione della cartella per salvare lo stato e i dati
+    - name: Create coffee monitor directory
+      file:
+        path: /opt/coffee-monitor
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    # File stato della macchinetta del caffè
+    - name: Create coffee status file
+      copy:
+        dest: /opt/coffee-monitor/state.json
+        content: |
+          {
+            "status": "ON",
+            "water": 80,
+            "coffee": 95,
+            "temperature": 92,
+            "cups": 0
+          }
+
+    # Creazione script bash per aggiornare lo stato della macchina
+    - name: Create coffee script monitor
+      copy:
+        src: ./update_state.sh
+        dest: /opt/coffee-monitor/update_state.sh
+        mode: '0755'
+
+    # Mi assicuro che cron sia stato installato (di default in Debian)
+    - name: Controll cron 
+      apt: 
+        name: cron
+        state: present 
+
+    # Avvio cron
+    - name: Start cron 
+      service: 
+        name: cron 
+        state: started 
+        enabled: true
+
+    # Cron 
+    - name: Cron update  
+      cron: 
+        name: coffee-monitor-update 
+        job: "/usr/bin/env bash /opt/coffee-monitor/update_state.sh" 
+        minute: "*/1"
