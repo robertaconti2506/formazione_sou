@@ -42,7 +42,6 @@ validate_ip
 validate_port
 
 
-
 echo "Controllo della raggiungibilità tra le due macchine" 
 echo 
 if ! ping -c 2 -W 2 "$ip">/dev/null 2>&1 ; then
