@@ -20,7 +20,7 @@ end=$3
 validate_ip() {
 	if [[ -z "$ip" || ! "$ip" =~ ^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$ ]]; then
 		echo "IP non valido"
-    		exit 1
+    	exit 1
 	fi
 }
 
@@ -55,6 +55,6 @@ for (( port=start; port<=end; port++ )); do
 #	if nc -w 1 "$ip" "$port" >/dev/null 2>&1; then
 		echo "Porta $port aperta"
 	else
-       	 	echo "Porta $port chiusa"
+       	 echo "Porta $port chiusa"
 	fi
 done
