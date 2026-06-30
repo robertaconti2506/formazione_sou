@@ -52,7 +52,6 @@ fi
 # Ciclo for per eseguire lo scanner su tutte le porte del range (TCP)
 for (( port=start; port<=end; port++ )); do
 	if nc -w 1 "$ip" "$port" < /dev/null >/dev/null 2>&1; then
-#	if nc -w 1 "$ip" "$port" >/dev/null 2>&1; then
 		echo "Porta $port aperta"
 	else
        	 echo "Porta $port chiusa"
