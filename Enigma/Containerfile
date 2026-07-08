@@ -1,0 +1,14 @@
+# Immagine base
+FROM bash:5.2
+
+# Tutti i comandi successivi verranno eseguiti da qui
+WORKDIR /enigma
+
+# Copia il progetto 
+COPY . .
+
+# Permessi per i file (devono essere eseguibili)
+RUN chmod +x *.sh src/*.sh
+
+# Quando viene avviato questo container, viene avviato anche il file di avvio del progetto
+CMD ["./enigma.sh"]
