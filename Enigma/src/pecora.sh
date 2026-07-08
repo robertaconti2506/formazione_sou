@@ -5,7 +5,6 @@ LOG_FILE="$2"
 
 # Controllo Shared State
 validate_state() {
-
 	if [[ ! -f "$STATE_FILE" ]]; then
 		echo "[PECORA] Errore: Shared State non trovato" >> "$LOG_FILE"
 		return 1
@@ -27,7 +26,6 @@ validate_state() {
 
 # Legge lo Shared State e registra la posizione del lupo
 receive_update() {
-
 	if ! validate_state; then 
 		return 1
 	fi
