@@ -1,0 +1,41 @@
+---
+- name: Configurazione limiti utenti 
+  hosts: all 
+
+  vars: 
+    users:
+      - name: marco 
+        environment: produzione 
+      - name: gianni 
+        environment: sviluppo
+    whitelist_users:
+      - maria 
+      - giovanna 
+
+  tasks: 
+
+    - name: Creazione nuovo file da template
+      ansible.builtin.template:
+        src: limits.conf.j2
+        dest: /tmp/output.txt
+      delegate_to: localhost
+    
+    - name: Inserisco limiti nel file 
+      ansible.builtin.blockinfile: 
+        path: /etc/security/limits.conf 
+        block: "{{ lookup('ansible.builtin.file', '/tmp/output.txt') }}"
+        insertafter: EOF 
+        create: yes
+
+    - name: Creo whitelist da template 
+      ansible.builtin.template: 
+        src: access.conf.j2 
+        dest: /tmp/access_whitelist.txt 
+      delegate_to: localhost
+
+    - name: Inserisco whitelist utenti
+      ansible.builtin.blockinfile:
+        path: /etc/security/access.conf 
+        block: "{{ lookup('ansible.builtin.file', '/tmp/access_whitelist.txt') }}" 
+        insertbefore: "- : ALL : ALL" 
+

@@ -1,0 +1,19 @@
+---
+- name: Gestione pacchetti 
+  hosts: all
+  become: true 
+
+  vars: 
+    pacchetti: 
+      vim: present
+      curl: absent
+  
+  tasks:
+    
+    # package potrebbe esser sostituito con apt/dnf/yum (in base alla distrivuzione)
+    # questi moduli supportano anche "update_cache: true"
+    - name: Installazione pacchetti 
+      ansible.builtin.package: 
+        name: "{{ item.key }}"
+        state: "{{ item.value }}"
+      loop: "{{ pacchetti | dict2items }}"

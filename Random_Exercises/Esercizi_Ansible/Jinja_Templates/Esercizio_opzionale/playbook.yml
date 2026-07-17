@@ -1,0 +1,28 @@
+---
+- name: Dockerfile 
+  hosts: all 
+
+  vars: 
+   docker_images:
+     - name: python-app 
+       image: python:3.12
+       workdir: /app 
+       file: app.py 
+       port: 8080
+       command: python app.py 
+
+     - name: nginx-web 
+       image: nginx:latest
+       workdir: /usr/share/nginx/html 
+       file: index.html 
+       port: 80 
+       command: "nginx -g daemon off;"
+
+  tasks:
+
+    - name: Generazione Dockerfile da template 
+      ansible.builtin.template:
+        src: Dockerfile.j2
+        dest: "/tmp/Dockerfile-{{ item.name }}"
+      loop: "{{ docker_images }}"
+

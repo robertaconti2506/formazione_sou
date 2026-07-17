@@ -1,0 +1,14 @@
+--- 
+- name: Ansible Vault 
+  hosts: all
+  connection: local
+  gather_facts: false 
+
+  vars_files: 
+    - vars_vault.yml
+
+  tasks: 
+    - name: Password utenti
+      ansible.builtin.debug:
+        msg: "La {{ item.key }}  è {{ item.value }}" 
+      loop: "{{ password_utenti | dict2items }}"

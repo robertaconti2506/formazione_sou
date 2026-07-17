@@ -1,0 +1,9 @@
+{% for user in users %}
+{% if user.environment == "produzione" %}
+{{ user.name }} soft nofile 10000
+{{ user.name }} hard nofile 10000
+{% else %}
+{{ user.name }} soft nofile 1000
+{{ user.name }} hard nofile 1000 
+{% endif %}
+{% endfor %}
