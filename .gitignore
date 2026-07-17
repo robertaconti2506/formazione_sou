@@ -1,4 +1,10 @@
 .DS_Store
 *.swp
+*.swo
+
+# Vagrant
 .vagrant/
-reverse-proxy-haproxy/.vagrant/
+**/.vagrant/
+
+# Ansible Vault
+*_vault_pass.txt
