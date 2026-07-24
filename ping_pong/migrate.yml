@@ -1,0 +1,85 @@
+---
+- name: Migrazione container
+  hosts: nodes 
+  become: yes 
+  gather_facts: no 
+  run_once: yes
+
+  tasks: 
+
+    - name: Verifica se il container esiste su node1
+      community.docker.docker_container_info: 
+        name: echo-server
+      delegate_to: node1
+      register: container_node1
+
+    - name: Verifica se il container esiste su node2
+      community.docker.docker_container_info: 
+        name: echo-server
+      delegate_to: node2
+      register: container_node2
+
+    - name: Mostra lo stato del container 
+      ansible.builtin.debug: 
+        msg: 
+          - "node1 -> {{ container_node1.exists }}" 
+          - "node2 -> {{ container_node2.exists }}"
+   
+    - name: Errore se il container è presente su entrambi i nodi
+      ansible.builtin.fail: 
+        msg: "Stato non valido: il container è presente sia su node1 che su node2" 
+      when: 
+        - container_node1.exists 
+        - container_node2.exists 
+
+    - name: Errore se il container è assente su entrambi i nodi
+      ansible.builtin.fail: 
+        msg: "Stato non valido: il container è assente sia su node 1 che su node2" 
+      when: 
+        - not container_node1.exists 
+        - not container_node2.exists 
+
+    - name: Destinazione node2
+      ansible.builtin.set_fact: 
+        destination_node: "node2"
+        source_node: "node1"
+      when: container_node1.exists 
+
+    - name: Destinazione node1
+      ansible.builtin.set_fact: 
+        destination_node: "node1"
+        source_node: "node2"
+      when: container_node2.exists
+
+    - name: Mostra destinazione scelta 
+      ansible.builtin.debug: 
+        msg:
+          - "Nodo sorgente: {{ source_node }}"
+          - "Nodo destinazione: {{ destination_node }}"
+
+    - name: Ferma il container sul nodo sorgente 
+      community.docker.docker_container:
+        name: echo-server
+        state: absent 
+      delegate_to: "{{ source_node }}"
+
+    - name: Avvia il container sul nodo destinazione 
+      community.docker.docker_container:
+        name: echo-server 
+        image: ealen/echo-server
+        state: started 
+        restart_policy: unless-stopped 
+      delegate_to: "{{ destination_node }}"
+
+    - name: Verifica che il container sia partito
+      community.docker.docker_container_info: 
+        name: echo-server
+      delegate_to: "{{ destination_node }}"
+      register: migrated_container 
+
+    - name: Conferma migrazione
+      ansible.builtin.debug: 
+        msg: "Container migrato correttamente su {{ destination_node }}"
+      when: not migrated_container.exists
+        
+

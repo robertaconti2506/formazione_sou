@@ -1,0 +1,72 @@
+---
+- name: Aggiorna la cache dei pacchetti APT
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: Installa i pacchetti necessari
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+    state: present
+
+- name: Crea directory per le chiavi APT
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
+- name: Scarica la chiave GPG di Docker
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: '0644'
+
+# deb822_repository sostituisce apt_repository (deprecato da ansible-core 2.25)
+- name: Aggiungere repository Docker
+  ansible.builtin.deb822_repository:
+    name: docker
+    types: deb
+    uris: https://download.docker.com/linux/ubuntu
+    suites: jammy
+    components:
+      - stable
+    architectures:
+      - amd64
+    signed_by: /etc/apt/keyrings/docker.asc
+
+- name: Installazione dei pacchetti Docker
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+    update_cache: true
+
+- name: Avvia e abilita Docker service
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Verifica lo stato di Docker service
+  ansible.builtin.service_facts:
+
+- name: Aggiungi utente vagrant al gruppo docker
+  ansible.builtin.user:
+    name: vagrant
+    groups: docker
+    append: true
+
+- name: Mostra Docker status
+  ansible.builtin.debug:
+    msg: "Docker è attivo sul nodo"
+  when: ansible_facts.services['docker.service'].state == 'running'
+
+- name: Errore se Docker non è attivo
+  ansible.builtin.fail:
+    msg: "Docker non è partito correttamente"
+  when: ansible_facts.services['docker.service'].state != 'running'

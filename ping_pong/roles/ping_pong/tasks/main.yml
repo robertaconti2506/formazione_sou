@@ -1,0 +1,25 @@
+---
+- name: Scarica immagine echo-server
+  community.docker.docker_image:
+    name: ealen/echo-server
+    source: pull
+
+- name: Avvia il container echo-server su node1
+  community.docker.docker_container:
+    name: echo-server
+    image: ealen/echo-server
+    state: started
+    restart_policy: unless-stopped
+  when: inventory_hostname == "node1"
+
+- name: Assicurati che il container non sia presente su node2
+  community.docker.docker_container:
+    name: echo-server
+    state: absent
+  when: inventory_hostname == "node2"
+
+#- name: Copia script migrazione 
+# ansible.builtin.copy: 
+# src: migrate.sh 
+# dest: /usr/local/bin/migrate.sh 
+# mode: '0755' 

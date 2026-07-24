@@ -1,0 +1,28 @@
+---
+- name: Configura il cron sull'host
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+
+    - name: Trova il percorso di ansible-playbook 
+      ansible.builtin.command: which ansible-playbook 
+      register: ansible_playbook_path
+      changed_when: false 
+
+    - name: Esegui migrazione container ogni minuto
+      ansible.builtin.cron:
+        name: "Ping pong container migration"
+        minute: "*"
+        job: > 
+          cd {{ playbook_dir }} && 
+          {{ ansible_playbook_path.stdout }} 
+          -i inventory.ini migrate.yml
+          >> cron.log 2>&1
+
+    - name: Mostra il percorso di ansible-playbook 
+      ansible.builtin.debug:
+        var: ansible_playbook_path.stdout
+
+    

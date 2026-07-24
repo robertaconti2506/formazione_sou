@@ -1,0 +1,57 @@
+Vagrant.configure("2") do |config|
+  
+  # configurazione delle due macchine
+  config.vm.box = "ubuntu/jammy64"
+
+
+  # VM1 - NODO1
+  config.vm.define "node1" do |n1|
+    n1.vm.hostname = "node1"
+
+    n1.vm.network "private_network", ip: "192.168.56.41"
+
+    n1.vm.provider "virtualbox" do |vb|
+      vb.name = "vm-node1"
+      vb.memory = 1024
+      vb.cpus = 1
+    end
+
+    n1.vm.provision "shell", inline: <<-SHELL
+      mkdir -p /home/vagrant/.ssh
+      cat /vagrant/keys/ansible_key.pub >> /home/vagrant/.ssh/authorized_keys
+      chmod 600 /home/vagrant/.ssh/authorized_keys
+      chown -R vagrant:vagrant /home/vagrant/.ssh
+
+      resolvectl dns enp0s3 8.8.8.8
+    SHELL
+  end
+
+
+  # VM2 - NODE2
+  config.vm.define "node2" do |n2|
+    n2.vm.hostname = "node2"
+    
+    n2.vm.network "private_network", ip: "192.168.56.42"
+
+    n2.vm.provider "virtualbox" do |vb|
+      vb.name = "vm-node2"
+      vb.memory = 1024
+      vb.cpus = 1
+    end
+
+    n2.vm.provision "shell", inline: <<-SHELL
+      mkdir -p /home/vagrant/.ssh
+      cat /vagrant/keys/ansible_key.pub >> /home/vagrant/.ssh/authorized_keys
+      chmod 600 /home/vagrant/.ssh/authorized_keys
+      chown -R vagrant:vagrant /home/vagrant/.ssh
+
+      resolvectl dns enp0s3 8.8.8.8
+    SHELL
+  end  
+
+ config.vm.provision "ansible" do |ansible|
+   ansible.playbook = "playbook.yml"
+   ansible.inventory_path = "inventory.ini"
+ end 
+
+end

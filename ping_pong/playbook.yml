@@ -1,0 +1,7 @@
+- name: Configurazione nodi
+  hosts: nodes
+  become: true
+
+  roles:
+    - docker
+    - ping_pong
