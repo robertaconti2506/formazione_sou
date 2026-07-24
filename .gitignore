@@ -8,3 +8,9 @@
 
 # Ansible Vault
 *_vault_pass.txt
+
+# Ping pong 
+ping_pong/cron.log
+ping_pong/keys/ansible_key 
+ping_pong/ssh-config
+
