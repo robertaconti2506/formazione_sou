@@ -1,0 +1,20 @@
+---
+- name: Test moduli custom
+  hosts: localhost
+  tasks:
+
+    - name: Eseguo il modulo custom docker_info, non serve passare parametri
+      docker_info:
+      register: module_result # Registriamo l'output del task per fare debug
+
+    - name: Debug del parametro registrato prima
+      ansible.builtin.debug:
+        var: module_result
+
+    - name: Print output del nostro modulo
+      ansible.builtin.debug:
+        msg: 
+          - "La versione di Docker è: {{ module_result.docker_version }}"
+          - "I container in esecuzione sono: {{ module_result.running_containers }}"
+          - "Le immagini presenti sono: {{ module_result.images_number }}"
+          - "Le docker network sono: {{ module_result.docker_network }}"
