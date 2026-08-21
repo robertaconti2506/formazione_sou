@@ -1,20 +1,26 @@
 ---
 - name: Modulo ansible custom
-  become: true
-  hosts: all
-  gather_facts: false
+   become: true
+   hosts: all
+   gather_facts: false
 
-  tasks:
-    - name: Configurazione Apache2
-      apache_conf:
-        ip: "192.168.3.2"
-        port: "1234"
-        index: |
-          <html>
-            <h1>Daje!</h1>
-          </html>
-      register: risultato
+   tasks:
+     - name: Assicura che jq sia installato
+       ansible.builtin.package:
+         name: jq
+         state: present
+         update_cache: true
 
-    - name: Mostra risultato
-      ansible.builtin.debug:
-        var: risultato
+     - name: Installazione e configurazione di Apache2
+       apache_conf:
+         ip: "192.168.3.2"
+         port: "444"
+         index: |
+           <html>
+             <h1>Daje!</h1>
+           </html>
+       register: risultato
+
+     - name: Mostra risultato
+       ansible.builtin.debug:
+         var: risultato

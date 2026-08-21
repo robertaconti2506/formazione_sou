@@ -7,6 +7,7 @@ INDEX=$(jq -r '.index // empty' "$1")
 
 CONFIG="/etc/apache2/sites-enabled/000-default.conf"
 TESTO=$(cat "/var/www/html/index.html")
+PORTS_CONF="/etc/apache2/ports.conf"
 CHANGED=false
 
 if [ -z "$IP" ]; then
@@ -59,9 +60,12 @@ if [ "$TESTO" != "$INDEX" ]; then
   CHANGED=true
 fi
 
-if grep -q "<VirtualHost $IP:$PORT>" "$CONFIG"; then
-  echo "Configurazione già corretta"
-else
+if ! grep -q "^Listen $PORT" "$PORTS_CONF"; then
+  sed -i "s/^Listen .*/Listen $PORT/" "$PORTS_CONF"
+  CHANGED=true
+fi
+
+if ! grep -q "<VirtualHost $IP:$PORT>" "$CONFIG"; then
   sed -i "s/<VirtualHost .*/<VirtualHost $IP:$PORT>/" "$CONFIG"
   CHANGED=true
 fi

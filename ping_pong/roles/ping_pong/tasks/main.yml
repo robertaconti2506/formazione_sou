@@ -17,9 +17,3 @@
     name: echo-server
     state: absent
   when: inventory_hostname == "node2"
-
-#- name: Copia script migrazione 
-# ansible.builtin.copy: 
-# src: migrate.sh 
-# dest: /usr/local/bin/migrate.sh 
-# mode: '0755' 
